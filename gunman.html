@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jungle Hunter - Bird Shooting Challenge</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071b10;
+}
+
+body{
+    user-select:none;
+}
+
+/* =========================
+   GAME CONTAINER
+========================= */
+
+#game{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    cursor:crosshair;
+    background:
+        linear-gradient(
+            to bottom,
+            #71c8ef 0%,
+            #a7ddf3 38%,
+            #5eaa4c 39%,
+            #367331 65%,
+            #183d1d 100%
+        );
+}
+
+/* =========================
+   SKY
+========================= */
+
+.sun{
+    position:absolute;
+    width:120px;
+    height:120px;
+    right:9%;
+    top:8%;
+    border-radius:50%;
+    background:#ffe58a;
+    box-shadow:0 0 50px rgba(255,220,90,.7);
+}
+
+.cloud{
+    position:absolute;
+    width:180px;
+    height:55px;
+    background:rgba(255,255,255,.55);
+    border-radius:50px;
+    filter:blur(2px);
+    animation:cloudMove linear infinite;
+}
+
+.cloud:before,
+.cloud:after{
+    content:"";
+    position:absolute;
+    background:inherit;
+    border-radius:50%;
+}
+
+.cloud:before{
+    width:80px;
+    height:80px;
+    left:25px;
+    top:-30px;
+}
+
+.cloud:after{
+    width:100px;
+    height:100px;
+    right:20px;
+    top:-45px;
+}
+
+.cloud1{
+    left:-220px;
+    top:14%;
+    animation-duration:45s;
+}
+
+.cloud2{
+    left:-300px;
+    top:28%;
+    transform:scale(.7);
+    animation-duration:60s;
+    animation-delay:8s;
+}
+
+@keyframes cloudMove{
+    from{transform:translateX(0)}
+    to{transform:translateX(130vw)}
+}
+
+/* =========================
+   MOUNTAINS
+========================= */
+
+.mountain{
+    position:absolute;
+    bottom:34%;
+    width:0;
+    height:0;
+    border-left:190px solid transparent;
+    border-right:190px solid transparent;
+    border-bottom:230px solid #315c39;
+    opacity:.9;
+}
+
+.m1{left:2%}
+.m2{left:25%; transform:scale(1.3)}
+.m3{left:54%; transform:scale(.9)}
+.m4{left:72%; transform:scale(1.25)}
+
+/* =========================
+   GROUND
+========================= */
+
+.ground{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:37%;
+    background:
+        radial-gradient(circle at 20% 20%,#4d8e36 0 3px,transparent 4px),
+        radial-gradient(circle at 60% 50%,#315e29 0 4px,transparent 5px),
+        radial-gradient(circle at 80% 20%,#5a913c 0 3px,transparent 4px),
+        linear-gradient(#315d27,#102d16);
+}
+
+/* =========================
+   TREES
+========================= */
+
+.tree{
+    position:absolute;
+    bottom:25%;
+    width:80px;
+    height:300px;
+}
+
+.tree .trunk{
+    position:absolute;
+    bottom:0;
+    left:33px;
+    width:22px;
+    height:190px;
+    background:linear-gradient(to right,#4c2e17,#7c4b24,#3a2415);
+    border-radius:10px;
+}
+
+.tree .leaf{
+    position:absolute;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#4f9e3e,#185d28 70%);
+}
+
+.leaf.a{
+    width:110px;
+    height:110px;
+    left:-10px;
+    top:30px;
+}
+
+.leaf.b{
+    width:130px;
+    height:130px;
+    left:25px;
+    top:0;
+}
+
+.leaf.c{
+    width:100px;
+    height:100px;
+    left:45px;
+    top:55px;
+}
+
+.tree1{left:1%;transform:scale(1.2)}
+.tree2{left:13%;transform:scale(.85)}
+.tree3{right:12%;transform:scale(1.1)}
+.tree4{right:0;transform:scale(1.3)}
+
+/* =========================
+   BUSHES
+========================= */
+
+.bush{
+    position:absolute;
+    bottom:20%;
+    width:220px;
+    height:110px;
+}
+
+.bush span{
+    position:absolute;
+    bottom:0;
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 25%,#559b3b,#194c24);
+}
+
+.bush span:nth-child(1){left:0}
+.bush span:nth-child(2){left:55px}
+.bush span:nth-child(3){left:110px}
+
+.bush1{left:15%}
+.bush2{left:40%}
+.bush3{right:15%}
+
+/* =========================
+   HUD
+========================= */
+
+#hud{
+    position:absolute;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:12px;
+    z-index:1000;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.hudBox{
+    min-width:135px;
+    padding:12px 18px;
+    border-radius:14px;
+    background:rgba(0,0,0,.68);
+    color:white;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.25);
+    box-shadow:0 5px 20px rgba(0,0,0,.25);
+    backdrop-filter:blur(5px);
+}
+
+.hudLabel{
+    font-size:12px;
+    opacity:.75;
+    letter-spacing:1px;
+}
+
+.hudValue{
+    font-size:25px;
+    font-weight:bold;
+    margin-top:3px;
+}
+
+#ammo{
+    color:#ffe76b;
+}
+
+#score{
+    color:#72ff8a;
+}
+
+#timer{
+    color:#69d8ff;
+}
+
+#phase{
+    color:#ffae6b;
+}
+
+/* =========================
+   GUNMAN
+========================= */
+
+#gunman{
+    position:absolute;
+    left:110px;
+    bottom:22%;
+    width:150px;
+    height:230px;
+    z-index:500;
+}
+
+/* head */
+
+.head{
+    position:absolute;
+    width:54px;
+    height:58px;
+    left:47px;
+    top:8px;
+    border-radius:50%;
+    background:
+        radial-gradient(circle at 38% 40%,#f1bd91 0 4px,transparent 5px),
+        linear-gradient(135deg,#d99060,#8f4d2e);
+    border:3px solid #492617;
+}
+
+.head:before{
+    content:"";
+    position:absolute;
+    width:64px;
+    height:20px;
+    left:-5px;
+    top:-8px;
+    border-radius:50%;
+    background:#282018;
+}
+
+/* body */
+
+.body{
+    position:absolute;
+    left:35px;
+    top:62px;
+    width:80px;
+    height:105px;
+    border-radius:30px 30px 15px 15px;
+    background:linear-gradient(90deg,#283d32,#526b42,#263b30);
+    border:3px solid #17281d;
+}
+
+/* legs */
+
+.leg{
+    position:absolute;
+    width:30px;
+    height:85px;
+    top:155px;
+    border-radius:15px;
+    background:#222d27;
+}
+
+.leg1{left:40px}
+.leg2{left:78px}
+
+/* arms */
+
+.arm{
+    position:absolute;
+    width:25px;
+    height:90px;
+    background:#344d3a;
+    border-radius:15px;
+    transform-origin:top center;
+}
+
+.arm1{
+    left:25px;
+    top:70px;
+    transform:rotate(-45deg);
+}
+
+.arm2{
+    right:20px;
+    top:70px;
+    transform:rotate(40deg);
+}
+
+/* =========================
+   GUN
+========================= */
+
+#gunPivot{
+    position:absolute;
+    left:118px;
+    bottom:38%;
+    width:1px;
+    height:1px;
+    z-index:700;
+}
+
+#gun{
+    position:absolute;
+    left:0;
+    top:0;
+    width:190px;
+    height:50px;
+    transform-origin:15px 25px;
+    pointer-events:none;
+}
+
+.gunBody{
+    position:absolute;
+    left:15px;
+    top:15px;
+    width:110px;
+    height:22px;
+    border-radius:7px;
+    background:linear-gradient(#4d5656,#171b1b);
+    border:2px solid #111;
+}
+
+.gunBarrel{
+    position:absolute;
+    left:100px;
+    top:18px;
+    width:80px;
+    height:16px;
+    border-radius:3px;
+    background:linear-gradient(#3d4646,#101414);
+    border:2px solid #090b0b;
+}
+
+.gunBarrel:after{
+    content:"";
+    position:absolute;
+    right:-10px;
+    top:-3px;
+    width:13px;
+    height:20px;
+    background:#090b0b;
+    border-radius:3px;
+}
+
+.gunGrip{
+    position:absolute;
+    left:45px;
+    top:31px;
+    width:28px;
+    height:48px;
+    border-radius:4px 4px 10px 10px;
+    background:linear-gradient(90deg,#151919,#444);
+    transform:rotate(18deg);
+}
+
+.trigger{
+    position:absolute;
+    left:78px;
+    top:29px;
+    width:12px;
+    height:20px;
+    border:3px solid #111;
+    border-top:0;
+    border-radius:0 0 10px 10px;
+}
+
+/* =========================
+   BIRDS
+========================= */
+
+.bird{
+    position:absolute;
+    width:90px;
+    height:60px;
+    z-index:400;
+    pointer-events:none;
+    filter:drop-shadow(0 6px 4px rgba(0,0,0,.3));
+}
+
+.birdBody{
+    position:absolute;
+    left:28px;
+    top:20px;
+    width:42px;
+    height:28px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#232323,#090909);
+}
+
+.birdHead{
+    position:absolute;
+    left:60px;
+    top:13px;
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    background:#242424;
+}
+
+.birdHead:before{
+    content:"";
+    position:absolute;
+    right:-13px;
+    top:8px;
+    width:16px;
+    height:7px;
+    background:#e2a42a;
+    clip-path:polygon(0 0,100% 50%,0 100%);
+}
+
+.birdEye{
+    position:absolute;
+    right:7px;
+    top:7px;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:white;
+}
+
+.birdEye:after{
+    content:"";
+    position:absolute;
+    left:2px;
+    top:2px;
+    width:2px;
+    height:2px;
+    background:#111;
+    border-radius:50%;
+}
+
+.wing{
+    position:absolute;
+    width:43px;
+    height:25px;
+    background:#171717;
+    border-radius:100% 0 100% 0;
+    transform-origin:right bottom;
+}
+
+.wing1{
+    left:20px;
+    top:2px;
+    animation:flap .22s infinite alternate ease-in-out;
+}
+
+.wing2{
+    left:20px;
+    top:38px;
+    transform:rotate(25deg);
+    animation:flap2 .22s infinite alternate ease-in-out;
+}
+
+@keyframes flap{
+    from{transform:rotate(15deg)}
+    to{transform:rotate(-35deg)}
+}
+
+@keyframes flap2{
+    from{transform:rotate(35deg)}
+    to{transform:rotate(75deg)}
+}
+
+/* =========================
+   HIT EFFECT
+========================= */
+
+.hitEffect{
+    position:absolute;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:4px solid #ffe45c;
+    box-shadow:
+        0 0 15px #ffdd55,
+        inset 0 0 20px #ff9d00;
+    animation:hitAnim .4s ease-out forwards;
+    pointer-events:none;
+    z-index:1000;
+}
+
+@keyframes hitAnim{
+    from{
+        transform:scale(.3);
+        opacity:1;
+    }
+    to{
+        transform:scale(1.8);
+        opacity:0;
+    }
+}
+
+/* =========================
+   MUZZLE FLASH
+========================= */
+
+#muzzleFlash{
+    position:absolute;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    background:radial-gradient(circle,#fff 0,#ffd42f 25%,#ff7900 50%,transparent 72%);
+    pointer-events:none;
+    display:none;
+    z-index:900;
+}
+
+/* =========================
+   START SCREEN
+========================= */
+
+#startScreen,
+#gameOver{
+    position:absolute;
+    inset:0;
+    z-index:3000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(7px);
+}
+
+.panel{
+    width:min(500px,90%);
+    padding:35px;
+    border-radius:25px;
+    background:linear-gradient(145deg,rgba(20,40,25,.96),rgba(7,20,12,.96));
+    border:1px solid rgba(255,255,255,.2);
+    color:white;
+    text-align:center;
+    box-shadow:0 20px 70px rgba(0,0,0,.5);
+}
+
+.panel h1{
+    font-size:42px;
+    margin-bottom:10px;
+    color:#d9ff86;
+}
+
+.panel p{
+    color:#c6d4c9;
+    line-height:1.6;
+    margin:10px 0;
+}
+
+.instructions{
+    margin:20px 0;
+    text-align:left;
+    background:rgba(255,255,255,.06);
+    padding:18px;
+    border-radius:15px;
+}
+
+.instructions div{
+    margin:8px 0;
+}
+
+button{
+    border:0;
+    padding:15px 35px;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    background:linear-gradient(135deg,#a8e063,#4a9c39);
+    color:#10210f;
+    box-shadow:0 7px 20px rgba(0,0,0,.3);
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* =========================
+   GAME OVER
+========================= */
+
+.finalScore{
+    font-size:60px;
+    font-weight:bold;
+    color:#ffe36a;
+    margin:15px 0;
+}
+
+.resultLine{
+    font-size:18px;
+    margin:8px;
+}
+
+/* =========================
+   CROSSHAIR
+========================= */
+
+#crosshair{
+    position:absolute;
+    width:34px;
+    height:34px;
+    border:2px solid rgba(255,255,255,.8);
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:1500;
+}
+
+#crosshair:before,
+#crosshair:after{
+    content:"";
+    position:absolute;
+    background:rgba(255,255,255,.8);
+}
+
+#crosshair:before{
+    width:2px;
+    height:48px;
+    left:14px;
+    top:-9px;
+}
+
+#crosshair:after{
+    width:48px;
+    height:2px;
+    left:-9px;
+    top:14px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+    #hud{
+        top:8px;
+        gap:5px;
+    }
+
+    .hudBox{
+        min-width:90px;
+        padding:7px 9px;
+    }
+
+    .hudValue{
+        font-size:18px;
+    }
+
+    .hudLabel{
+        font-size:9px;
+    }
+
+    #gunman{
+        left:45px;
+        transform:scale(.75);
+        transform-origin:bottom left;
+    }
+
+    #gunPivot{
+        left:80px;
+        bottom:32%;
+    }
+
+    .panel h1{
+        font-size:30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- SKY -->
+    <div class="sun"></div>
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+
+    <!-- MOUNTAINS -->
+    <div class="mountain m1"></div>
+    <div class="mountain m2"></div>
+    <div class="mountain m3"></div>
+    <div class="mountain m4"></div>
+
+    <!-- TREES -->
+    <div class="tree tree1">
+        <div class="trunk"></div>
+        <div class="leaf a"></div>
+        <div class="leaf b"></div>
+        <div class="leaf c"></div>
+    </div>
+
+    <div class="tree tree2">
+        <div class="trunk"></div>
+        <div class="leaf a"></div>
+        <div class="leaf b"></div>
+        <div class="leaf c"></div>
+    </div>
+
+    <div class="tree tree3">
+        <div class="trunk"></div>
+        <div class="leaf a"></div>
+        <div class="leaf b"></div>
+        <div class="leaf c"></div>
+    </div>
+
+    <div class="tree tree4">
+        <div class="trunk"></div>
+        <div class="leaf a"></div>
+        <div class="leaf b"></div>
+        <div class="leaf c"></div>
+    </div>
+
+    <!-- BUSHES -->
+    <div class="bush bush1">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="bush bush2">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="bush bush3">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="ground"></div>
+
+    <!-- HUD -->
+    <div id="hud">
+
+        <div class="hudBox">
+            <div class="hudLabel">BULLETS</div>
+            <div class="hudValue" id="ammo">100</div>
+        </div>
+
+        <div class="hudBox">
+            <div class="hudLabel">SCORE</div>
+            <div class="hudValue" id="score">0</div>
+        </div>
+
+        <div class="hudBox">
+            <div class="hudLabel">TIME</div>
+            <div class="hudValue" id="timer">60</div>
+        </div>
+
+        <div class="hudBox">
+            <div class="hudLabel">BIRDS</div>
+            <div class="hudValue" id="phase">1</div>
+        </div>
+
+    </div>
+
+    <!-- GUNMAN -->
+    <div id="gunman">
+
+        <div class="head"></div>
+
+        <div class="body"></div>
+
+        <div class="arm arm1"></div>
+        <div class="arm arm2"></div>
+
+        <div class="leg leg1"></div>
+        <div class="leg leg2"></div>
+
+    </div>
+
+    <!-- GUN -->
+    <div id="gunPivot">
+
+        <div id="gun">
+
+            <div class="gunBody"></div>
+            <div class="gunBarrel"></div>
+            <div class="gunGrip"></div>
+            <div class="trigger"></div>
+
+        </div>
+
+    </div>
+
+    <div id="muzzleFlash"></div>
+
+    <div id="crosshair"></div>
+
+    <!-- START SCREEN -->
+    <div id="startScreen">
+
+        <div class="panel">
+
+            <h1>🌴 JUNGLE HUNTER</h1>
+
+            <p>
+                Bird Shooting Challenge
+            </p>
+
+            <div class="instructions">
+
+                <div>🔫 You have <b>100 bullets</b>.</div>
+                <div>🖱️ Move the mouse to aim the gun.</div>
+                <div>🎯 Left click anywhere to fire.</div>
+                <div>🐦 0–20 sec: 1 bird</div>
+                <div>🐦 20–40 sec: 2 birds</div>
+                <div>🐦 40–60 sec: 3 birds</div>
+                <div>⏱️ Game ends at 60 seconds OR 0 bullets.</div>
+
+            </div>
+
+            <button id="startButton">
+                START HUNT
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameOver" class="hidden">
+
+        <div class="panel">
+
+            <h1>🏆 GAME OVER</h1>
+
+            <div class="finalScore" id="finalScore">
+                0
+            </div>
+
+            <div class="resultLine">
+                Birds Hit:
+                <b id="finalHits">0</b>
+            </div>
+
+            <div class="resultLine">
+                Bullets Used:
+                <b id="finalBullets">0</b>
+            </div>
+
+            <div class="resultLine">
+                Bullets Remaining:
+                <b id="finalRemaining">100</b>
+            </div>
+
+            <br>
+
+            <button id="restartButton">
+                PLAY AGAIN
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+let running = false;
+
+let score = 0;
+let hits = 0;
+
+let bulletsLeft = 100;
+
+let timeLeft = 60;
+
+let startTime = 0;
+
+let timerInterval = null;
+
+let animationFrame = null;
+
+let birds = [];
+
+let birdId = 0;
+
+let pointerX = window.innerWidth / 2;
+let pointerY = window.innerHeight / 2;
+
+let audioContext = null;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const game = document.getElementById("game");
+
+const gun = document.getElementById("gun");
+
+const gunPivot = document.getElementById("gunPivot");
+
+const ammoDisplay = document.getElementById("ammo");
+
+const scoreDisplay = document.getElementById("score");
+
+const timerDisplay = document.getElementById("timer");
+
+const phaseDisplay = document.getElementById("phase");
+
+const crosshair = document.getElementById("crosshair");
+
+const muzzleFlash = document.getElementById("muzzleFlash");
+
+const startScreen = document.getElementById("startScreen");
+
+const gameOver = document.getElementById("gameOver");
+
+const finalScore = document.getElementById("finalScore");
+
+const finalHits = document.getElementById("finalHits");
+
+const finalBullets = document.getElementById("finalBullets");
+
+const finalRemaining = document.getElementById("finalRemaining");
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+function initAudio(){
+
+    if(audioContext) return;
+
+    const AudioCtx =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if(AudioCtx){
+        audioContext = new AudioCtx();
+    }
+}
+
+
+function playGunshot(){
+
+    if(!audioContext) return;
+
+    if(audioContext.state === "suspended"){
+        audioContext.resume();
+    }
+
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    osc.type = "sawtooth";
+
+    osc.frequency.setValueAtTime(
+        120,
+        audioContext.currentTime
+    );
+
+    osc.frequency.exponentialRampToValueAtTime(
+        45,
+        audioContext.currentTime + .12
+    );
+
+    gain.gain.setValueAtTime(
+        .22,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioContext.currentTime + .14
+    );
+
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+
+    osc.start();
+    osc.stop(audioContext.currentTime + .15);
+}
+
+
+function playHitSound(){
+
+    if(!audioContext) return;
+
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    osc.type = "triangle";
+
+    osc.frequency.setValueAtTime(
+        650,
+        audioContext.currentTime
+    );
+
+    osc.frequency.exponentialRampToValueAtTime(
+        1000,
+        audioContext.currentTime + .08
+    );
+
+    gain.gain.setValueAtTime(
+        .12,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioContext.currentTime + .18
+    );
+
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+
+    osc.start();
+    osc.stop(audioContext.currentTime + .2);
+}
+
+
+/* =========================================================
+   AMMO
+========================================================= */
+
+function updateAmmo(){
+
+    ammoDisplay.textContent = bulletsLeft;
+
+    if(bulletsLeft <= 10){
+        ammoDisplay.style.color = "#ff5c5c";
+    }else{
+        ammoDisplay.style.color = "#ffe76b";
+    }
+}
+
+
+/* =========================================================
+   SCORE
+========================================================= */
+
+function updateScore(){
+
+    scoreDisplay.textContent = score;
+
+}
+
+
+/* =========================================================
+   CURRENT BIRD COUNT
+========================================================= */
+
+function getBirdCount(){
+
+    if(timeLeft > 40){
+        return 1;
+    }
+
+    if(timeLeft > 20){
+        return 2;
+    }
+
+    return 3;
+}
+
+
+/* =========================================================
+   UPDATE PHASE
+========================================================= */
+
+function updatePhase(){
+
+    const count = getBirdCount();
+
+    phaseDisplay.textContent = count;
+
+}
+
+
+/* =========================================================
+   CREATE BIRD
+========================================================= */
+
+function createBird(){
+
+    const bird = {
+
+        id: ++birdId,
+
+        x: 0,
+
+        y: 0,
+
+        vx: 0,
+
+        vy: 0,
+
+        targetX: 0,
+
+        targetY: 0,
+
+        speed: 1.5 + Math.random()*2.2,
+
+        angle: Math.random()*Math.PI*2,
+
+        turnTimer: 0,
+
+        bob: Math.random()*Math.PI*2,
+
+        alive:true,
+
+        rising:true,
+
+        riseProgress:0
+
+    };
+
+
+    /* RANDOM BUSH */
+
+    const bushPositions = [
+        {x:180,y:window.innerHeight*.72},
+        {x:window.innerWidth*.45,y:window.innerHeight*.72},
+        {x:window.innerWidth*.75,y:window.innerHeight*.72}
+    ];
+
+    const bush =
+        bushPositions[
+            Math.floor(
+                Math.random()*bushPositions.length
+            )
+        ];
+
+    bird.x = bush.x;
+
+    bird.y = window.innerHeight*.72;
+
+    bird.targetX =
+        150 + Math.random()*(window.innerWidth-300);
+
+    bird.targetY =
+        80 + Math.random()*(window.innerHeight*.48);
+
+    bird.vx =
+        (Math.random()-.5)*2;
+
+    bird.vy =
+        -(1.8 + Math.random()*1.5);
+
+
+    const el = document.createElement("div");
+
+    el.className = "bird";
+
+    el.innerHTML = `
+
+        <div class="birdBody"></div>
+
+        <div class="birdHead">
+            <div class="birdEye"></div>
+        </div>
+
+        <div class="wing wing1"></div>
+        <div class="wing wing2"></div>
+
+    `;
+
+    bird.element = el;
+
+    game.appendChild(el);
+
+    birds.push(bird);
+
+}
+
+
+/* =========================================================
+   SPAWN BIRD
+========================================================= */
+
+function spawnBird(){
+
+    if(!running) return;
+
+    const desired = getBirdCount();
+
+    const active =
+        birds.filter(b => b.alive).length;
+
+    if(active < desired){
+
+        createBird();
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIAL WAVE
+========================================================= */
+
+function maintainBirds(){
+
+    if(!running) return;
+
+    const desired = getBirdCount();
+
+    let active =
+        birds.filter(b => b.alive).length;
+
+    while(active < desired){
+
+        createBird();
+
+        active++;
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE BIRDS
+========================================================= */
+
+function updateBirds(){
+
+    for(let i=birds.length-1;i>=0;i--){
+
+        const bird = birds[i];
+
+        if(!bird.alive){
+
+            if(bird.element){
+                bird.element.remove();
+            }
+
+            birds.splice(i,1);
+
+            continue;
+        }
+
+
+        /* =========================================
+           RISING FROM BUSH
+        ========================================= */
+
+        if(bird.rising){
+
+            bird.riseProgress += .025;
+
+            bird.y -= 3.2;
+
+            bird.x += bird.vx;
+
+            if(bird.riseProgress >= 1){
+
+                bird.rising = false;
+
+            }
+
+        }
+
+        else{
+
+            /* RANDOM FLIGHT */
+
+            bird.turnTimer -= 1;
+
+            if(bird.turnTimer <= 0){
+
+                bird.angle +=
+                    (Math.random()-.5)*1.8;
+
+                bird.turnTimer =
+                    30 + Math.random()*80;
+
+            }
+
+
+            bird.vx =
+                Math.cos(bird.angle)*bird.speed;
+
+            bird.vy =
+                Math.sin(bird.angle)*bird.speed*.65;
+
+
+            bird.x += bird.vx;
+
+            bird.y += bird.vy;
+
+
+            /* NATURAL BOB */
+
+            bird.bob += .06;
+
+            bird.y +=
+                Math.sin(bird.bob)*.45;
+
+
+            /* BOUNDARIES */
+
+            const margin = 40;
+
+            if(bird.x < margin){
+
+                bird.x = margin;
+
+                bird.angle =
+                    Math.random()*.8-.4;
+
+            }
+
+            if(
+                bird.x >
+                window.innerWidth-120
+            ){
+
+                bird.x =
+                    window.innerWidth-120;
+
+                bird.angle =
+                    Math.PI +
+                    (Math.random()*.8-.4);
+
+            }
+
+            if(bird.y < 60){
+
+                bird.y = 60;
+
+                bird.angle += .8;
+
+            }
+
+            if(
+                bird.y >
+                window.innerHeight*.62
+            ){
+
+                bird.y =
+                    window.innerHeight*.62;
+
+                bird.angle -= .8;
+
+            }
+
+        }
+
+
+        bird.element.style.transform =
+            `translate(${bird.x}px,${bird.y}px)`;
+
+        /* FLIP BIRD BASED ON DIRECTION */
+
+        if(bird.vx < 0){
+
+            bird.element.style.transform +=
+                " scaleX(-1)";
+
+        }
+
+    }
+
+
+    maintainBirds();
+
+}
+
+
+/* =========================================================
+   GUN AIM - TRUE 360°
+========================================================= */
+
+function aimGun(x,y){
+
+    const rect =
+        gunPivot.getBoundingClientRect();
+
+    const centerX =
+        rect.left;
+
+    const centerY =
+        rect.top;
+
+    const dx = x-centerX;
+
+    const dy = y-centerY;
+
+    const angle =
+        Math.atan2(dy,dx)*180/Math.PI;
+
+    gun.style.transform =
+        `rotate(${angle}deg)`;
+
+}
+
+
+/* =========================================================
+   CROSSHAIR
+========================================================= */
+
+function updateCrosshair(x,y){
+
+    crosshair.style.left = x+"px";
+
+    crosshair.style.top = y+"px";
+
+}
+
+
+/* =========================================================
+   MUZZLE FLASH
+========================================================= */
+
+function showMuzzleFlash(){
+
+    const rect =
+        gun.getBoundingClientRect();
+
+    const x =
+        rect.right;
+
+    const y =
+        rect.top + rect.height/2;
+
+    muzzleFlash.style.left =
+        (x-27)+"px";
+
+    muzzleFlash.style.top =
+        (y-27)+"px";
+
+    muzzleFlash.style.display =
+        "block";
+
+    setTimeout(()=>{
+
+        muzzleFlash.style.display =
+            "none";
+
+    },70);
+
+}
+
+
+/* =========================================================
+   DISTANCE FROM POINT TO BULLET LINE
+========================================================= */
+
+function pointLineDistance(
+    px,
+    py,
+    x1,
+    y1,
+    x2,
+    y2
+){
+
+    const A = px-x1;
+
+    const B = py-y1;
+
+    const C = x2-x1;
+
+    const D = y2-y1;
+
+    const dot =
+        A*C+B*D;
+
+    const lenSq =
+        C*C+D*D;
+
+    let param =
+        lenSq !== 0 ?
+        dot/lenSq :
+        -1;
+
+    let xx;
+    let yy;
+
+    if(param < 0){
+
+        xx=x1;
+        yy=y1;
+
+    }
+
+    else if(param > 1){
+
+        xx=x2;
+        yy=y2;
+
+    }
+
+    else{
+
+        xx=x1+param*C;
+        yy=y1+param*D;
+
+    }
+
+    const dx =
+        px-xx;
+
+    const dy =
+        py-yy;
+
+    return Math.sqrt(dx*dx+dy*dy);
+
+}
+
+
+/* =========================================================
+   SHOOT
+========================================================= */
+
+function shoot(){
+
+    if(!running){
+        return;
+    }
+
+
+    /* =========================================
+       IMPORTANT:
+       EVERY SHOT DECREASES ONE BULLET
+    ========================================= */
+
+    if(bulletsLeft <= 0){
+
+        endGame();
+
+        return;
+
+    }
+
+
+    bulletsLeft--;
+
+    updateAmmo();
+
+    playGunshot();
+
+    showMuzzleFlash();
+
+
+    /* =========================================
+       BULLET TRAJECTORY
+    ========================================= */
+
+    const pivot =
+        gunPivot.getBoundingClientRect();
+
+    const startX =
+        pivot.left;
+
+    const startY =
+        pivot.top;
+
+
+    const gunRect =
+        gun.getBoundingClientRect();
+
+
+    /* barrel direction */
+
+    const angle =
+        Math.atan2(
+            pointerY-startY,
+            pointerX-startX
+        );
+
+
+    const endX =
+        startX +
+        Math.cos(angle)*2000;
+
+    const endY =
+        startY +
+        Math.sin(angle)*2000;
+
+
+    /* =========================================
+       CHECK BIRD COLLISION
+    ========================================= */
+
+    let hitBird = null;
+
+    let closestDistance =
+        Infinity;
+
+
+    birds.forEach(bird=>{
+
+        if(!bird.alive) return;
+
+
+        const rect =
+            bird.element.getBoundingClientRect();
+
+
+        const birdX =
+            rect.left+rect.width/2;
+
+        const birdY =
+            rect.top+rect.height/2;
+
+
+        const distance =
+            pointLineDistance(
+                birdX,
+                birdY,
+                startX,
+                startY,
+                endX,
+                endY
+            );
+
+
+        if(
+            distance < 42 &&
+            distance < closestDistance
+        ){
+
+            closestDistance =
+                distance;
+
+            hitBird =
+                bird;
+
+        }
+
+    });
+
+
+    /* =========================================
+       HIT
+    ========================================= */
+
+    if(hitBird){
+
+        registerHit(hitBird);
+
+    }
+
+
+    /* =========================================
+       100TH BULLET
+    ========================================= */
+
+    if(bulletsLeft === 0){
+
+        setTimeout(()=>{
+
+            if(running){
+                endGame();
+            }
+
+        },200);
+
+    }
+
+}
+
+
+/* =========================================================
+   REGISTER HIT
+========================================================= */
+
+function registerHit(bird){
+
+    if(!bird.alive){
+        return;
+    }
+
+    bird.alive = false;
+
+    hits++;
+
+    score += 10;
+
+    updateScore();
+
+    playHitSound();
+
+
+    /* HIT EFFECT */
+
+    const rect =
+        bird.element.getBoundingClientRect();
+
+    const effect =
+        document.createElement("div");
+
+    effect.className =
+        "hitEffect";
+
+    effect.style.left =
+        (rect.left+rect.width/2-40)+"px";
+
+    effect.style.top =
+        (rect.top+rect.height/2-40)+"px";
+
+    game.appendChild(effect);
+
+
+    setTimeout(()=>{
+
+        effect.remove();
+
+    },450);
+
+
+    /*
+       Replacement bird will be
+       created by maintainBirds()
+    */
+
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function startTimer(){
+
+    clearInterval(timerInterval);
+
+    startTime =
+        Date.now();
+
+
+    timerInterval =
+        setInterval(()=>{
+
+            if(!running) return;
+
+
+            const elapsed =
+                Math.floor(
+                    (Date.now()-startTime)/1000
+                );
+
+
+            timeLeft =
+                Math.max(
+                    0,
+                    60-elapsed
+                );
+
+
+            timerDisplay.textContent =
+                timeLeft;
+
+
+            updatePhase();
+
+
+            /* =================================
+               TIME FINISHED
+            ================================= */
+
+            if(timeLeft <= 0){
+
+                endGame();
+
+            }
+
+
+        },100);
+
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function gameLoop(){
+
+    if(!running){
+        return;
+    }
+
+    updateBirds();
+
+    animationFrame =
+        requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================================================
+   CLEAR BIRDS
+========================================================= */
+
+function clearBirds(){
+
+    birds.forEach(bird=>{
+
+        if(bird.element){
+            bird.element.remove();
+        }
+
+    });
+
+    birds = [];
+
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+function startGame(){
+
+    initAudio();
+
+
+    if(audioContext &&
+       audioContext.state === "suspended"){
+
+        audioContext.resume();
+
+    }
+
+
+    running = true;
+
+    score = 0;
+
+    hits = 0;
+
+    bulletsLeft = 100;
+
+    timeLeft = 60;
+
+    birdId = 0;
+
+
+    clearBirds();
+
+
+    updateAmmo();
+
+    updateScore();
+
+    timerDisplay.textContent =
+        timeLeft;
+
+    updatePhase();
+
+
+    startScreen.classList.add("hidden");
+
+    gameOver.classList.add("hidden");
+
+
+    /* CREATE INITIAL BIRD */
+
+    maintainBirds();
+
+
+    startTimer();
+
+
+    cancelAnimationFrame(
+        animationFrame
+    );
+
+    gameLoop();
+
+}
+
+
+/* =========================================================
+   END GAME
+========================================================= */
+
+function endGame(){
+
+    if(!running){
+        return;
+    }
+
+
+    running = false;
+
+
+    clearInterval(timerInterval);
+
+    cancelAnimationFrame(
+        animationFrame
+    );
+
+
+    finalScore.textContent =
+        score;
+
+    finalHits.textContent =
+        hits;
+
+    finalBullets.textContent =
+        100-bulletsLeft;
+
+    finalRemaining.textContent =
+        bulletsLeft;
+
+
+    gameOver.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================================
+   MOUSE MOVE
+========================================================= */
+
+game.addEventListener(
+    "pointermove",
+    function(e){
+
+        pointerX =
+            e.clientX;
+
+        pointerY =
+            e.clientY;
+
+
+        updateCrosshair(
+            pointerX,
+            pointerY
+        );
+
+
+        if(running){
+
+            aimGun(
+                pointerX,
+                pointerY
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LEFT CLICK = FIRE
+========================================================= */
+
+game.addEventListener(
+    "pointerdown",
+    function(e){
+
+        if(!running){
+            return;
+        }
+
+
+        if(e.button !== 0){
+            return;
+        }
+
+
+        pointerX =
+            e.clientX;
+
+        pointerY =
+            e.clientY;
+
+
+        aimGun(
+            pointerX,
+            pointerY
+        );
+
+
+        /*
+           Small delay ensures gun
+           has rotated toward pointer
+        */
+
+        shoot();
+
+    }
+);
+
+
+/* =========================================================
+   PREVENT CONTEXT MENU
+========================================================= */
+
+game.addEventListener(
+    "contextmenu",
+    function(e){
+
+        e.preventDefault();
+
+    }
+);
+
+
+/* =========================================================
+   START BUTTON
+========================================================= */
+
+document
+.getElementById("startButton")
+.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* =========================================================
+   RESTART BUTTON
+========================================================= */
+
+document
+.getElementById("restartButton")
+.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* =========================================================
+   INITIAL AIM
+========================================================= */
+
+updateCrosshair(
+    pointerX,
+    pointerY
+);
+
+aimGun(
+    pointerX,
+    pointerY
+);
+
+updateAmmo();
+
+updateScore();
+
+updatePhase();
+
+</script>
+
+</body>
+</html>
